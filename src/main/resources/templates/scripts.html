@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <script th:fragment="scripts">
+            var campo = document.getElementById("pass");
+            var icono = document.getElementById("icon");
+
+            function verPass() {
+                if (campo.getAttribute("type") === "password") {
+                    campo.setAttribute("type", "text");
+                    icono.setAttribute("class", "fa-solid fa-eye-slash");
+                } else {
+                    campo.setAttribute("type", "password");
+                    icono.setAttribute("class", "fa-solid fa-eye");
+                }
+            }
+
+            function sumarCantidad(button, name, number, max) {
+                if (parseInt($(name + number).val()) >= parseInt(max)) {
+                    let valor = $(name + number).val(parseInt(max));
+                    $("#" + button + "menos" + number).removeClass("disabled");
+                    if (parseInt($(name + number).val()) == parseInt(max)) {
+                        $("#" + button + "mas" + number).addClass("disabled");
+                    }
+                } else {
+                    let valor = $(name + number).val(parseInt($(name + number).val()) + 1);
+                    $("#" + button + "menos" + number).removeClass("disabled");
+                    if (parseInt($(name + number).val()) == parseInt(max)) {
+                        $("#" + button + "mas" + number).addClass("disabled");
+                    }
+
+                }
+
+            }
+
+            function restarCantidad(button, name, number, min = 1) {
+                if ($(name + number).val() <= min) {
+                    let valor = $(name + number).val(min);
+                    $("#" + button + "mas" + number).removeClass("disabled");
+                    if (parseInt($(name + number).val()) == min) {
+                        $("#" + button + "menos" + number).addClass("disabled");
+                    }
+                } else {
+                    let valor = $(name + number).val(parseInt($(name + number).val()) - 1);
+                    $("#" + button + "mas" + number).removeClass("disabled");
+                    if (parseInt($(name + number).val()) == min) {
+                        $("#" + button + "menos" + number).addClass("disabled");
+                    }
+            }
+            }
+
+            function cambiarGrande(img, id) {
+                let grande = $("#grande" + id).attr("src", img);
+            }
+
+            function vacio() {
+                swal.fire({
+                    icon: 'error',
+                    title: 'Carrito Vacio',
+                    text: 'Agrega productos a tu carrito'
+                });
+            }
+
+            function actualizarCarrito() {
+                let trueForm = $("#trueForm");
+                let form = $("#actuForm");
+                let divs = form.find(".actuDiv");
+                var string = "";
+                for (var i = 0; i < divs.length; i++) {
+                    let div = divs[i];
+                    let inputs = $(div).find("input");
+                    for (var i2 = 0; i2 < inputs.length; i2++) {
+                        let input1 = inputs[i2];
+                        let input2 = inputs[i2 + 1];
+                        if (i2 % 2 == 0) {
+                            let cantidad = $(input1).val();
+                            let id = $(input2).val();
+                            let campo = $("#cantidadCarrito" + id).val();
+
+                            if (campo != cantidad) {
+                                $(input1).val(campo)
+                                cantidad = $(input1).val();
+                            }
+                            string = string + " " + id + " " + cantidad;
+                        }
+                    }
+                }
+                $("#trueInput").val(string);
+
+                trueForm.submit();
+            }
+
+            function elegirSelected() {
+                let marcas = $("#marcaSelect").children();
+                let selected = $("#selected").val();
+                for (var i = 0; i < marcas.length; i++) {
+                    if (selected == $(marcas[i]).val()) {
+                        $("#marcaSelect option[value='" + selected + "']").attr("selected", "selected");
+                    }
+                }
+            }
+
+            function actualizarModelos() {
+                let marca = $("#marcaSelect option:selected").val();
+                let modelos = $("#modeloSelect");
+                $("#idMarca").val(marca);
+                $("#actualizarModelos").submit();
+
+            }
+
+            function verificarModelo() {
+                let marca = $("#marcaSelect option:selected").val();
+                let modelo = $("#marcaModelo").val();
+
+                if (modelo != marca) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'La marca y modelo no coinciden',
+                        text: 'Actualice los modelos'
+                    });
+                } else {
+                    $("#stage1").submit();
+                }
+            }
+
+            function verificarSize() {
+                let min = $("#minSizeSelect option:selected").val();
+                let max = $("#maxSizeSelect option:selected").val();
+
+                min = parseInt(min);
+                max = parseInt(max);
+
+                if (min > max) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Actualice los Sizes',
+                        text: 'El Size Minimo es mayor que el Size Maximo'
+                    });
+                } else {
+                    $("#stage2").submit();
+                }
+            }
+
+            function verificarStage3() {
+                var precio = parseInt($("#precioInput").val());
+                var stock = parseInt($("#stockInput").val());
+                var desc = $("#area");
+                console.log(stock)
+
+                if (stock <= 0 || isNaN(stock)) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Cantidad Incorrecta',
+                        text: 'La cantidad debe ser mayor a Cero (0)'
+                    });
+                } else if (precio <= 0 || isNaN(precio)) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Precio Incorrecto',
+                        text: 'El precio debe ser mayor a Cero (0)'
+                    });
+                } else if (desc.val().length < 20) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Descripcion muy corta',
+                        text: 'La descripcion debe contener almenos 20 caracteres'
+                    });
+                } else {
+                    $("#stage3").submit();
+                }
+            }
+
+            function verificarStage4() {
+                let form = $("#stage4");
+                let img1 = $("#img1");
+                let img2 = $("#img2");
+                let img3 = $("#img3");
+                let imagenes = $("#imagenesRegister");
+                if (img1.val().length <= 0 || img2.val().length <= 0 || img3.val().length <= 0) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Imagen Vacia',
+                        text: 'Debe ingresar los 3 enlaces'
+                    });
+                } else {
+                    let str = img1.val() + "," + img2.val() + "," + img3.val();
+                    imagenes.val(str);
+                    form.submit();
+                }
+            }
+
+            function registrarDatos() {
+                let form = $("#stage5");
+                let img1 = $("#img1");
+                let img2 = $("#img2");
+                let img3 = $("#img3");
+                let imagenes = $("#imagenesRegister");
+                let str = img1.val() + "," + img2.val() + "," + img3.val();
+                imagenes.val(str);
+
+                swal.fire({
+                    icon: 'success',
+                    title: 'Registro Completado',
+                    text: 'El producto se registro exitosamente',
+                    confirmButtonText: 'Finalizar',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    timer: 5000,
+                    timerProgressBar: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    } else if (result.dismiss === Swal.DismissReason.timer) {
+                        form.submit();
+                    }
+                });
+            }
+
+            function editarProducto(id) {
+                let form = $("#editarProductoForm" + id);
+                //Asignaciones
+                $("#stockTrue" + id).val($("#stockFake" + id).val());
+                $("#precioTrue" + id).val($("#precioFake" + id).val());
+                $("#minTrue" + id).val($("#minFake" + id).val());
+                $("#maxTrue" + id).val($("#maxFake" + id).val());
+                $("#trueArea" + id).val($("#fakeArea" + id).val());
+
+                //Validaciones
+                if (parseInt($("#stockTrue" + id).val()) < 0 || isNaN(parseInt($("#stockTrue" + id).val()))) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Cantidad invalida',
+                        text: 'Ingrese una cantidad valida'
+                    });
+                } else if (parseInt($("#precioTrue" + id).val()) <= 0 || isNaN(parseInt($("#precioTrue" + id).val()))) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Precio invalido',
+                        text: 'Ingrese una precio mayor a cero (0)'
+                    });
+                } else if (parseInt($("#minTrue" + id).val()) <= 0 || isNaN(parseInt($("#minTrue" + id).val()))) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Size Minimo invalido',
+                        text: 'Ingrese una size mayor a cero (0)'
+                    });
+                } else if (parseInt($("#maxTrue" + id).val()) <= 0 || isNaN(parseInt($("#maxTrue" + id).val()))) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Size Maximo invalido',
+                        text: 'Ingrese una size mayor a cero (0)'
+                    });
+                } else if (parseInt($("#maxTrue" + id).val()) < parseInt($("#minTrue" + id).val())) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Size Minimo invalido',
+                        text: 'El Size Minimo no puede ser mayor que el Size Maximo'
+                    });
+                } else if ($("#trueArea" + id).val().length < 20) {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Descripcion Invalida',
+                        text: 'La descripcion debe tener un minimo de 20 caracteres'
+                    });
+                } else {
+                    form.submit();
+                }
+
+
+            }
+
+            function eliminarProducto(id) {
+                window.location.href = "http://localhost:8080/dashboard/productos/eliminarProducto/" + id;
+            }
+
+            function elegirSizes() {
+                let selects = $("#divSizes").find("select");
+                let selectsVal = $("#divSizes").find("select option:selected");
+                let str = "";
+                let form = $("#formSizes");
+                let parrafos = $("#divSizes").find("p").text();
+                let spans = $("#divSizes").find("span").text();
+                var correcto = false;
+
+                for (let i = 0; i < selects.length; i++) {
+                    let valor = $(selects[i]).val();
+                    if (i == 0) {
+                        str = str + valor;
+                    } else {
+                        str = str + "," + valor;
+                    }
+                }
+                var conjunto = new Set();
+                if (parrafos.length != 1) {
+                    for (let i = 0; i < parrafos.length; i++) {
+                        let opciones = $(selects[i]).find("option");
+                        if (i > 0) {
+                            if (parseInt(spans[i]) >= opciones.length) {
+                                if (parseInt(parrafos[i]) == parseInt(parrafos[i - 1])) {
+                                    for (var j = 0; j < selectsVal.length; j++) {
+                                        if (conjunto.has(parseInt($(selectsVal[i]).val()))) {
+                                            swal.fire({
+                                                icon: 'error',
+                                                title: 'Size no disponible',
+                                                text: 'Solo queda un (1) producto con este size, por favor seleccione uno diferente'
+                                            });
+                                            correcto = false;
+                                            return;
+                                        } else {
+                                            conjunto.add(parseInt($(selectsVal[i - 1]).val()));
+                                            correcto = true;
+                                        }
+                                    }
+                                } else {
+                                    correcto = true;
+                                }
+                            } else {
+                                correcto = true;
+                            }
+                        }
+                    }
+                } else {
+                    correcto = true;
+                }
+
+                if (correcto == true) {
+                    $("#inputSizes").val(str);
+                    form.submit();
+                }
+            }
+
+            function pagar() {
+                var select = $("#method");
+                if (select.val() == "paypal") {
+                    $("#formPaypal").submit();
+                } else {
+                    $("#formPagoTarjeta").submit();
+
+                }
+            }
+
+            function pay() {
+                function validarTarjetaCredito() {
+                    var numeroTarjeta = $("#inputTarjeta").val();
+                    // Eliminar espacios en blanco y guiones
+                    let numeroLimpiado = numeroTarjeta.replace(/\s+/g, '').replace(/-/g, '');
+
+                    // Verificar si el número es numérico y tiene 16 dígitos
+                    if (!/^\d{16}$/.test(numeroLimpiado)) {
+                        return false;
+                    }
+
+                    // Aplicar el algoritmo de Luhn para validar
+                    let suma = 0;
+                    for (let i = 0; i < 16; i++) {
+                        let digito = parseInt(numeroLimpiado[i]);
+
+                        if (i % 2 === 0) {
+                            digito *= 2;
+                            if (digito > 9) {
+                                digito -= 9;
+                            }
+                        }
+
+                        suma += digito;
+                    }
+
+                    if ($("#inputTarjeta").val() == "0000 0000 0000 0000") {
+                        return false;
+                    } else {
+                        return suma % 10 === 0;
+                    }
+
+                }
+                var valid = validarTarjetaCredito();
+                if (valid) {
+                    if ($("#inputNombreTarjeta").val().length <= 5) {
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Nombre Invalido',
+                            text: 'Ingrese un nombre valido'
+                        });
+                    } else if ($("#fechaVencimiento").val().length < 5) {
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Fecha de vencimiento invalida',
+                            text: 'Ingrese una fecha valida'
+                        });
+                    } else if ($("#cvv").val().length < 3) {
+                        swal.fire({
+                            icon: 'error',
+                            title: 'CVV Invalido',
+                            text: 'Ingrese un Codigo de Seguridad valido'
+                        });
+                    } else {
+                        $("#formPagar").submit();
+                    }
+
+                } else {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Tarjeta Invalida',
+                        text: 'Ingrese una tarjeta valida'
+                    });
+                }
+            }
+
+            function regresarCarrito() {
+                let cantidades = $(".actuDiv").find("input");
+                let inputs = $(".divInput").find("input");
+                let botones = $(".divInput").find("button");
+                let stocks = $(".divStock").find("input");
+                let j = 0;
+                let k = 0;
+                for (let i = 0; i < cantidades.length; i++) {
+                    if (i % 2 == 0) {
+                        $(inputs[j]).val($(cantidades[i]).val());
+                        j++;
+                    }
+                    if (k != cantidades.length - 1){
+                        if ($(inputs[k]).val() == 1) {
+                            $(botones[k]).addClass("disabled");
+                        } else {
+                            $(botones[k]).removeClass("disabled");
+                        }
+
+                        if ($(inputs[k]).val() == $(stocks[j]).val()) {
+                            $(botones[k]).addClass("disabled");
+                        } else {
+                            $(botones[k]).removeClass("disabled");
+                        }
+                    } else {
+                        $(botones[k - 1]).removeClass("disabled");
+                        $(botones[k]).removeClass("disabled");
+                    }
+                    k++;
+                }
+            }
+
+        </script>
+    </body>
+</html>

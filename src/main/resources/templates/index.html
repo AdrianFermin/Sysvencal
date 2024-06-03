@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Inicio</title>
+        <meta charset="UTF-8">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <link rel="shortcut icon" href="http://drive.google.com/uc?export=view&id=1tLEbLI6OT8zKJa8GAGWg6etc13GfTKg_"/>
+        <script src="https://kit.fontawesome.com/32842ccf5f.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <p id="username" hidden th:value="${usuarioLogued.nombre}"></p>
+        <p id="generoUsr" hidden th:value="${usuarioLogued.genero.idGenero}"></p>
+        <div th:if="${bienvenida == 1}">
+            <script>
+                let username = $("#username").attr("value");
+                let genero = $("#generoUsr").attr("value");
+                var mensaje;
+                if (genero == 1) {
+                    mensaje = "Bienvenido " + username;
+                } else {
+                    mensaje = "Bienvenida " + username;
+                }
+
+                Swal.fire(
+                        mensaje,
+                        'Aqui encontraras el calzado que buscabas',
+                        'success'
+                        );
+            </script>
+        </div>
+        <div class="container-fluid bg-dark bg-gradient shadow text-white sticky-top">
+            <div class="row">
+                <div class="col-md-4">
+                    <a type="button" th:href="@{/}" class="text-decoration-none text-white">
+                        <div class="d-flex flex-row ms-3 mb-2">
+                            <img src="http://drive.google.com/uc?export=view&id=1tLEbLI6OT8zKJa8GAGWg6etc13GfTKg_" width="75px" height="75px" alt="Logo"/>
+                            <h1 class="mt-3 ms-1">Import Boutique</h1>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex flex-row">
+                        <form class="input-group mt-4" th:action="@{/}">
+                            <input class="form-control" type="search" placeholder="Buscar" aria-label="Search" name="busqueda">
+                            <button class="btn btn-secondary" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        </form>
+                        <div class="dropdown mt-4 ms-1">
+                            <button type="button" class="btn" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                <i class="fa-solid fa-filter fa-xl" style="color: #c2c2c2;"></i>
+                            </button>
+                            <div class="dropdown-menu" style="width: 350px; height: 300px">
+                                <h4 class="dropdown-header">Filtros</h4>
+                                <form th:action="@{/}"  th:object="${producto}">
+                                    <div class="mt-2 d-flex flex-row">
+                                        <div class="mb-3 ms-3">
+                                            <input class="form-control" type="text" th:field="*{precio}" placeholder="Precio Maximo"/>
+                                        </div>
+                                        <div class="mb-3 ms-3 me-3">
+                                            <select class="form-select"  th:field="*{marca.idMarca}">
+                                                <option value="0">Marcas</option>
+                                                <div th:each="marca : ${marcas}">
+                                                    <option th:value="${marca.idMarca}" th:text="${marca.nombre}" ></option>
+                                                </div>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 d-flex flex-row">
+                                        <div class="mb-3 ms-3">
+                                            <select class="form-select"  th:field="*{genero.idGenero}">
+                                                <option value="0">Genero</option>
+                                                <option value="1">Masculino</option>
+                                                <option value="2">Femenino</option>
+                                                <option value="3">Unisex</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3 ms-3">
+                                            <select class="form-select"  th:field="*{categoria.idCategoria}">
+                                                <option value="0">Categorias</option>
+                                                <div th:each="categoria : ${categorias}">
+                                                    <option th:value="${categoria.idCategoria}" th:text="${categoria.nombre}" ></option>
+                                                </div>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 d-flex flex-row">
+                                        <div class="mb-3 ms-3">
+                                            <select class="form-select"  th:field="*{minSize.idSize}">
+                                                <option value="0">Min. Size</option>
+                                                <div th:each="size : ${sizes}">
+                                                    <option th:value="${size.idSize}" th:text="${size.numero}"></option>
+                                                </div>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3 ms-3">
+                                            <select class="form-select"  th:field="*{maxSize.idSize}">
+                                                <option value="0">Max. Size</option>
+                                                <div th:each="size : ${sizes}">
+                                                    <option th:value="${size.idSize}" th:text="${size.numero}" ></option>
+                                                </div>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 d-flex flex-row">
+                                        <input class="btn btn-success ms-3" type="submit" name="filtrar" value="Filtrar"/>
+                                        <a class="btn btn-warning ms-3" th:href="@{/}">Limpiar Filtros</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2"></div>
+                <div class="col-md-1">
+                    <div class="d-flex flex-row-reverse">
+                        <div th:if="${!carrito.isEmpty}">
+                            <div class="mt-4" style="z-index: 1; position: relative;">
+                                <button class="btn btn-transparent" data-bs-toggle="modal" data-bs-target="#carritoModal"><i class="fa-solid fa-cart-shopping fa-2xl fa-flip-horizontal" style="color: #c2c2c2;margin-top: 16px;"></i></button>
+                            </div>
+                            <div class="" style="z-index: 2; position: relative; bottom: 45px; left: 35px;">
+                                <i class="fa-solid fa-circle fa-xl" style="color: #fa0019;"><p class="text-white fs-6 ms-2" th:text="${carrito.size}"></p></i>
+                            </div>
+                        </div>
+                        <div th:if="${carrito.isEmpty}">
+                            <div class="me-3 mt-4" style="">
+                                <button class="btn btn-transparent" onClick="vacio()" ><i class="fa-solid fa-cart-shopping fa-2xl fa-flip-horizontal" style="color: #c2c2c2;margin-top: 16px;"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="d-flex flex-row-reverse">
+                        <div class="me-3 mt-4">
+                            <button type="button" class="btn" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                <i class="fa-solid fa-circle-user fa-2xl" style="color: #c2c2c2;"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div th:if="${usuarioLogued.tipo.idTipo == 2}">
+                                    <a th:href="@{/pedidos}" class="text-decoration-none">
+                                        <div class="d-flex flex-row text-secondary">
+                                            <i class="fa-solid fa-receipt fa-xl mt-3 ms-2" style="color: #757575; margin-top: 1px;"></i><h5 class="ms-2" style="margin-top: 2px">Mis Pedidos</h5>
+                                        </div>
+                                    </a>
+                                    <hr class="dropdown-divider">
+                                    <a th:href="@{/logout}" class="text-decoration-none">
+                                        <div class="d-flex flex-row text-secondary">
+                                            <i class="fa-solid fa-power-off fa-xl mt-3 ms-2" style="color: #757575; margin-top: 1px;"></i><h5 class="ms-2" style="margin-top: 2px">Log out</h5>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div th:if="${usuarioLogued.tipo.idTipo == 1}">
+                                    <a th:href="@{/dashboard}" class="text-decoration-none">
+                                        <div class="d-flex flex-row text-secondary">
+                                            <i class="fa-solid fa-chart-line fa-xl mt-3 ms-2" style="color: #757575; margin-top: 1px;"></i><h5 class="ms-2" style="margin-top: 2px">Dashboard</h5>
+                                        </div>
+                                    </a>
+                                    <hr class="dropdown-divider">
+                                    <a th:href="@{/pedidos}" class="text-decoration-none">
+                                        <div class="d-flex flex-row text-secondary">
+                                            <i class="fa-solid fa-receipt fa-xl mt-3 ms-2" style="color: #757575; margin-top: 1px;"></i><h5 class="ms-2" style="margin-top: 2px">Mis Pedidos</h5>
+                                        </div>
+                                    </a>
+                                    <hr class="dropdown-divider">
+                                    <a th:href="@{/logout}" class="text-decoration-none">
+                                        <div class="d-flex flex-row text-secondary mt-2">
+                                            <i class="fa-solid fa-power-off fa-xl mt-3 ms-2" style="color: #757575; margin-top: 1px;"></i><h5 class="ms-2" style="margin-top: 2px">Log out</h5>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <div class="ms-5 mt-4 container">
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-md-11">
+                    <div class="container bg-light border border-1 rounded border-light-subtle shadow mb-5">
+                        <div class="row mt-3 mb-3">
+                            <div class="d-flex flex-wrap ms-3">
+                                <section th:replace="modalCarrito :: modalCarrito"></section>
+                                <div th:each="producto : ${productos}">
+                                    <div th:if="${producto.estado.idEstado == 1}">
+                                        <div class="card mb-3 mt-3 ms-3 rounded" style="width: 16rem;">
+                                            <div th:each="portada : ${portadas}">
+                                                <div th:if="${portada.producto.idProducto == producto.idProducto}" class="text-center">
+                                                    <img th:src="${portada.imagen}" class="card-img-top mt-2" style="width: 200px;height: 160px;object-fit: contain;">
+                                                </div>
+                                            </div>
+                                            <div class="card-body bg-light rounded">
+                                                <strong><h6 th:text="${producto.nombre}"></h6></strong>
+                                                <h6 th:text="${'$' + producto.precio + ' USD'}"></h6>
+                                                <div th:if="${producto.stock > 0}">
+                                                    <form method="post" th:action="@{/agregar/} + ${producto.idProducto}">
+                                                        <div class="input-group mt-3">
+                                                            <button th:id="${'indexmenos' + producto.idProducto}" type="button" th:onclick="|restarCantidad('index','#cantidad' ,'${producto.idProducto}')|" class="btn btn-outline-secondary disabled"><i class="fa-solid fa-minus"></i></button>
+                                                            <input name="cantidad" th:id="${'cantidad' + producto.idProducto}" class="form-control text-center" min="1" value="1" readonly/>
+                                                            <button th:id="${'indexmas' + producto.idProducto}" type="button" th:onclick="|sumarCantidad('index','#cantidad' ,'${producto.idProducto}', '${producto.stock}')|" class="btn btn-outline-secondary"><i class="fa-solid fa-plus"></i></button>
+                                                        </div>
+                                                        <div class="d-flex flex-row justify-content-center">
+                                                            <button type="button" class="btn btn-secondary mb-2 mt-3" data-bs-toggle="modal" data-bs-target="#detalleModal" th:attr="data-bs-target=${'#' + producto.codigo}">Detalles</button>
+                                                            <button class="btn btn-success ms-2 mb-2 mt-3" type="submit"><i class="fa-solid fa-cart-plus"></i></button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="justify-content-center d-flex flex-column" th:if="${producto.stock == 0}">
+                                                    <img class="ms-5" src="http://drive.google.com/uc?export=view&id=1zWCkt0b-gYbK6PKStrr339s_J_v-uEbm" width="115px"/>
+                                                    <button type="button" class="btn btn-secondary mb-2 mt-3" data-bs-toggle="modal" data-bs-target="#detalleModal" th:attr="data-bs-target=${'#' + producto.codigo}">Detalles</button>
+                                                </div>
+                                                <section th:replace="modalDetalles :: modalDetalles"></section>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+        </div>
+        <!-- Scripts -->
+        <script th:replace="scripts :: scripts"></script>
+    </body>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</html>

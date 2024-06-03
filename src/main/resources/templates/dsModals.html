@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <link rel="shortcut icon" href="http://drive.google.com/uc?export=view&id=1tLEbLI6OT8zKJa8GAGWg6etc13GfTKg_"/>
+        <script src="https://kit.fontawesome.com/32842ccf5f.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <!-- USUARIOS -->
+
+        <!-- Agregar Usuario -->
+        <section th:fragment="agregarUsuarioModal">
+            <div class="modal fade" id="agregarUsuarioModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal">Agregar Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-white">
+                            <section>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-3"></div>
+                                        <div class="col-md-6">
+                                            <form th:action="@{/agregarUsuario}" method="post" th:object="${usuario}">
+                                                <input type="hidden" name="idUsuario" th:field="*{idUsuario}"/>
+                                                <input class="form-control" type="text" name="nombre" th:field="*{nombre}" placeholder="Nombre Completo" required/>
+                                                <br>
+                                                <input class="form-control" type="email" name="email" th:field="*{email}" placeholder="Email" required/>
+                                                <br>
+                                                <div class="input-group mb-2">
+                                                    <input id="pass" class="form-control" type="password" name="pass" th:field="*{pass}" placeholder="Password" required/>
+                                                    <button onclick="verPass()" class="btn btn-outline-secondary" type="button"><i id="icon" class="fa-solid fa-eye"></i></button>
+                                                </div>
+                                                <label class="form-label" for="Genero">Genero:</label>
+                                                <select class="form-select mb-2" th:field="*{genero.idGenero}" required>
+                                                    <option value="1">Masculino</option>
+                                                    <option value="2">Femenino</option>
+                                                </select>
+                                                <label class="form-label" for="Genero">Tipo:</label>
+                                                <select class="form-select" th:field="*{tipo.idTipo}" required>
+                                                    <option value="1">Administrador</option>
+                                                    <option value="2">Cliente</option>
+                                                </select>
+                                                <br>
+                                                <div class="d-grid gap-2">
+                                                    <input class="btn btn-success" type="submit" name="registrar" value="Agregar Usuario"/>
+                                                    <br/>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="modal-footer bg-light pb-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Editar Usuario -->
+        <section th:fragment="editarUsuarioModal">
+            <div class="modal fade" th:id="${'editarUsuario' + usuario.idUsuario}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal">Editar Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-white">
+                            <section>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-3"></div>
+                                        <div class="col-md-6">
+                                            <form th:action="@{/editarUsuario/} + ${usuario.idUsuario}" method="post" th:object="${usuario}">
+                                                <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}"/>
+                                                <label class="form-label" for="nombre">Nombre Completo:</label>
+                                                <input class="form-control" type="text" name="nombre"  th:value="${usuario.nombre}" placeholder="Nombre Completo" disabled/>
+                                                <br>
+                                                <label class="form-label" for="email">Email:</label>
+                                                <input class="form-control" type="email" name="email" th:value="${usuario.email}" placeholder="Email" disabled/>
+                                                <br>
+                                                <label class="form-label" for="genero">Genero:</label>
+                                                <input class="form-control" type="text" name="genero" th:value="${usuario.genero.nombre}" placeholder="Genero" disabled/>
+                                                <br>
+                                                <div th:if="${usuario.tipo.idTipo == 1}">
+                                                    <label class="form-label" for="tipo">Tipo:</label>
+                                                    <select class="form-select" th:field="*{tipo.idTipo}" required>
+                                                        <option value="1">Administrador</option>
+                                                        <option value="2">Cliente</option>
+                                                    </select>
+                                                    <br>
+                                                </div>
+                                                <div th:if="${usuario.tipo.idTipo == 2}">
+                                                    <label class="form-label" for="tipo">Tipo:</label>
+                                                    <select class="form-select" th:field="*{tipo.idTipo}" required>
+                                                        <option value="2">Cliente</option>
+                                                        <option value="1">Administrador</option>
+                                                    </select>
+                                                    <br>
+                                                </div>
+                                                <div th:if="${usuario.estado.idEstado == 1}">
+                                                    <label class="form-label" for="estado">Estado:</label>
+                                                    <select class="form-select" th:field="*{estado.idEstado}" required>
+                                                        <option value="1">Activo</option>
+                                                        <option value="2">Inactivo</option>
+                                                    </select>
+                                                    <br>
+                                                </div>
+                                                <div th:if="${usuario.estado.idEstado == 2}">
+                                                    <label class="form-label" for="estado">Estado:</label>
+                                                    <select class="form-select" th:field="*{estado.idEstado}" required>
+                                                        <option value="2">Inactivo</option>
+                                                        <option value="1">Activo</option>
+                                                    </select>
+                                                    <br>
+                                                </div>
+                                                <div class="d-grid gap-2">
+                                                    <input class="btn btn-success" type="submit" name="registrar" value="Editar"/>
+                                                    <br/>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="modal-footer bg-light pb-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CARRITO -->
+
+        <!-- Detalle de Carritos -->
+        <section th:fragment="detalleCarritoModal">
+            <div class="modal fade" th:id="${'detalleCarrito' + carrito.idCarrito}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal">Detalles del carrito</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-white">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <h4>Usuario:</h4>
+                                            <h6 th:text="${carrito.usuario.nombre}"></h6>
+                                        </div>
+                                        <div th:if="${!empty.contains(carrito)}">
+                                            <div class="container border border-1 border-secondary rounded-top">
+                                                <div class="d-flex flex-row">
+                                                    <strong><p class="mt-2">Producto</p></strong>
+                                                    <div class="d-flex mt-1" style="height: 40px; margin-left: 150px">
+                                                        <div class="vr border rounded"></div>
+                                                    </div>
+                                                    <strong><p class="ms-4 mt-2">Cantidad</p></strong>
+                                                    <div class="d-flex mt-1" style="height: 40px; margin-left: 27px">
+                                                        <div class="vr border rounded"></div>
+                                                    </div>
+                                                    <strong><p class="ms-4 mt-2">Precio</p></strong>
+                                                </div>
+                                            </div>
+                                            <div class="overflow-auto border border-top-0 border-secondary rounded-bottom" style="height: 400px">
+                                                <div class="" th:each="detalle : ${detalles}">
+                                                    <div th:if="${detalle.carrito.idCarrito == carrito.idCarrito}">
+                                                        <div class="container">
+                                                            <div class="d-flex flex-row">
+                                                                <div class="col-md-5">
+                                                                    <p class="fs-4 mt-4" th:text="${detalle.producto.nombre}"></p>
+                                                                </div>
+                                                                <div class="d-flex ms-4" style="height: 100px; ">
+                                                                    <div class="vr border rounded" style=""></div>
+                                                                </div>
+                                                                <div class="col-md-2 text-center ms-3">
+                                                                    <p class="fs-4 mt-4" th:text="${detalle.cantidad}"></p>
+                                                                </div>
+                                                                <div class="d-flex ms-4" style="height: 100px; ">
+                                                                    <div class="vr border rounded" style=""></div>
+                                                                </div>
+                                                                <div class="col-md-3 text-center ms-2">
+                                                                    <p class="fs-4 mt-4" th:text="${'$' + detalle.cantidad * detalle.producto.precio + ' USD'}"></p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div th:if="${empty.contains(carrito)}">
+                                            <h2>El carrito está vacio</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light pb-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRODUCTOS -->
+
+        <!-- Agregar Modelo -->
+
+        <section th:fragment="agregarModeloModal">
+            <div class="modal fade" id="agregarModeloModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal">Agregar Modelo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-white">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8">
+                                        <form id="addModel" th:action="@{/agregarModelo}" th:object="${modelo}" method="post">
+                                            <label for="marca" class="form-label">Marca:</label>
+                                            <input th:value="${selected.nombre}" class="form-control" disabled/>
+                                            <input id="marcaIdFake" th:value="${selected.idMarca}" class="form-control" type="hidden"/>
+                                            <input id="marcaId" class="form-control" type="hidden" th:field="*{marca.idMarca}"/>
+                                            <label for="modelo" class="form-label mt-2">Modelo:</label>
+                                            <input type="text" class="form-control" th:field="*{nombre}" required placeholder="Nombre del modelo"/>
+                                            <input type="submit" class="btn btn-success mt-2" value="Guardar"/>
+                                        </form>
+                                        <script>
+                                            $("#marcaId").val($("#marcaIdFake").val());
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light pb-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agregar Marca -->
+
+        <section th:fragment="agregarMarcaModal">
+            <div class="modal fade" id="agregarMarcaModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal">Agregar Marca</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-white">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8">
+                                        <form id="addModel" th:action="@{/agregarMarca}" th:object="${marca}" method="post">
+                                            <label for="marca" class="form-label">Marca:</label>
+                                            <input type="text" class="form-control" th:field="*{nombre}" required placeholder="Nombre de la marca"/>
+                                            <input type="submit" class="btn btn-success mt-2" value="Guardar"/>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light pb-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agregar Categoria -->
+
+        <section th:fragment="agregarCategoriaModal">
+            <div class="modal fade" id="agregarCategoriaModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal">Agregar Categoria</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-white">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8">
+                                        <form id="addModel" th:action="@{/agregarCategoria}" th:object="${categoria}" method="post">
+                                            <label for="nombre" class="form-label mt-2"><strong>Genero:</strong></label>
+                                            <select class="form-select" th:field="*{genero.idGenero}">
+                                                <option th:each="genero : ${generos}" th:text="${genero.nombre}" th:value="${genero.idGenero}"></option>
+                                            </select>
+                                            <label for="marca" class="form-label mt-2">Categoria:</label>
+                                            <input type="text" class="form-control" th:field="*{nombre}" required placeholder="Nombre de la categoria"/>
+                                            <input type="submit" class="btn btn-success mt-2" value="Guardar"/>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light pb-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Editar Productos -->
+        <section th:fragment="editarProductoModal">
+            <div class="modal fade" th:id="${'editarProducto' + producto.idProducto}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal">Editar Producto</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-white">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6">
+                                        <form th:id="${'editarProductoForm' + producto.idProducto}" th:action="@{/dashboard/productos/editarProducto/} + ${producto.idProducto}" method="post" th:object="${producto}">
+                                            <input type="hidden" name="idProducto" th:value="${producto.idProducto}"/>
+                                            <label class="form-label" for="nombre">Nombre:</label>
+                                            <input class="form-control" type="text" name="nombre"  th:value="${producto.nombre}" placeholder="Nombre Completo" disabled/>
+                                            <br>
+                                            <label class="form-label" for="nombre">Cantidad Disponible:</label>
+                                            <input class="form-control" type="number" min="0" th:id="${'stockFake' + producto.idProducto}"  th:value="${producto.stock}" placeholder="Stock" required/>
+                                            <input class="form-control" type="hidden" min="0" th:id="${'stockTrue' + producto.idProducto}"  th:field="*{stock}" placeholder="Stock" required/>
+                                            <br>
+                                            <label class="form-label" for="nombre">Precio:</label>
+                                            <input class="form-control" type="number" min="1" th:id="${'precioFake' + producto.idProducto}"  th:value="${producto.precio}" placeholder="Precio" required/>
+                                            <input class="form-control" type="hidden" min="1" th:id="${'precioTrue' + producto.idProducto}"  th:field="*{precio}" placeholder="Precio" required/>
+                                            <br>
+                                            <label class="form-label" for="nombre">Size Minimo:</label>
+                                            <input class="form-control" type="number" min="1" th:id="${'minFake' + producto.idProducto}"  th:value="${producto.minSize.idSize}" placeholder="Size Minimo" required/>
+                                            <input class="form-control" type="hidden" min="1" th:id="${'minTrue' + producto.idProducto}"  th:field="*{minSize.idSize}" placeholder="Size Minimo" required/>
+                                            <br>
+                                            <label class="form-label" for="nombre">Size Maximo:</label>
+                                            <input class="form-control" type="number" min="1" th:id="${'maxFake' + producto.idProducto}"  th:value="${producto.maxSize.idSize}" placeholder="Size Maximo" required/>
+                                            <input class="form-control" type="hidden" min="1" th:id="${'maxTrue' + producto.idProducto}"  th:field="*{maxSize.idSize}" placeholder="Size Maximo" required/>
+                                            <br>
+                                            <label for="descripcion" class="form-label">Descripcion:</label>
+                                            <textarea rows="4" th:id="${'fakeArea' + producto.idProducto}" class="form-control" maxlength="250" th:text="${producto.descripcion}"></textarea>
+                                            <textarea hidden rows="4" th:id="${'trueArea' + producto.idProducto}" class="form-control" maxlength="250" th:field="*{descripcion}"></textarea>
+                                            <div class="d-flex flex-row-reverse">
+                                                <span class="fs-6 text-secondary" th:id="${'contador' + producto.idProducto}">-/300</span>
+                                            </div>
+                                            <br/>
+                                        </form>
+                                        <div class="d-grid gap-2">
+                                            <button type="button" th:onclick="|editarProducto(${producto.idProducto})|" class="btn btn-success">Editar</button>
+                                            <br/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+
+
+                                function actualizarMaster(id) {
+                                    var contador = $("#contador" + id);
+                                    var area = $("#fakeArea" + id);
+                                    function actualizarLimite() {
+                                        contador.html(area.val().length + "/300");
+                                        if (area.val().length == 300) {
+                                            $(contador).removeClass("text-secondary");
+                                            $(contador).addClass("text-danger");
+                                        } else if (area.val().length < 300 && contador.hasClass("text-danger")) {
+                                            $(contador).removeClass("text-danger");
+                                            $(contador).addClass("text-secondary");
+                                        }
+                                    }
+
+                                    $(area).keyup(function () {
+                                        actualizarLimite();
+                                    });
+
+                                    $(area).change(function () {
+                                        actualizarLimite();
+                                    });
+
+                                }
+
+                            </script>
+                        </div>
+                        <div class="modal-footer bg-light pe-5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detalle de Productos -->
+        <section th:fragment="modalDetalles">
+            <div class="modal fade" th:id="${producto.codigo}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal" th:text="${producto.nombre}">Modal title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-white">
+                            <section>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-6 ms-3 mt-2">
+                                            <div class="d-flex">
+                                                <div th:each="imagen : ${imagenes}">
+                                                    <div th:if="${imagen.producto.idProducto == producto.idProducto}">
+                                                        <div class="ms-3 mb-3">
+                                                            <a class="cosita" th:attr="onclick=|cambiarGrande('${imagen.imagen}', '${producto.idProducto}')|"><img class="img-thumbnail" th:id="${'mini' + imagen.idImagen}" th:src="${imagen.imagen}" style="width: 200px; height: 100px; object-fit: contain; cursor: pointer;"/></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="ms-3" th:each="portada : ${portadas}">
+                                                <div th:if="${portada.producto.idProducto == producto.idProducto}">
+                                                    <img class="img-thumbnail" th:id="${'grande' + producto.idProducto}" th:src="${portada.imagen}" style="width: 700px; height: 400px; object-fit: contain;"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <div class="d-flex ms-4" style="height: 535px;">
+                                                <div class="vr border rounded"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h4>Codigo:</h4>
+                                            <p class="mb-2" style="text-align: justify;" th:text="${producto.codigo}"></p>
+                                            <h4>Nombre:</h4>
+                                            <p class="mb-2" style="text-align: justify;" th:text="${producto.nombre}"></p>
+                                            <h4>Precio:</h4>
+                                            <p class="mb-2" style="text-align: justify;" th:text="${'$' + producto.precio + ' USD'}"></p>
+                                            <h4>Size Disponibles:</h4>
+                                            <p class="mb-2" style="text-align: justify;" th:text="${producto.minSize.numero + ' - ' + producto.maxSize.numero}"></p>
+                                            <h4>Descripción:</h4>
+                                            <p style="text-align: justify;" th:text="${producto.descripcion}"></p>
+                                            <div th:if="${producto.stock > 0}">
+                                                <h4>Cantidad Disponible:</h4>
+                                                <p style="text-align: justify;" th:text="${producto.stock}"></p>
+                                            </div>
+                                            <div class="text-center d-flex flex-column" th:if="${producto.stock == 0}">
+                                                <div class="ms-5 mt-1">
+                                                    <img class="ms-1" src="http://drive.google.com/uc?export=view&id=1zWCkt0b-gYbK6PKStrr339s_J_v-uEbm" width="200px"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="modal-footer bg-light pb-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FACTURA -->
+
+        <!-- Detalle de Facturas -->
+        <section th:fragment="detalleFacturaModal">
+            <div class="modal fade" th:id="${'detalleFactura' + factura.idFactura}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal">Detalles de la factura</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body bg-white">
+                            <div class="container">
+                                <h2 class="fw-bold mt-3" th:text="${'Comprador: ' + factura.usuario.nombre}"></h2>
+                                <hr/>
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8 mt-2 mb-3">
+                                        <div th:if="${factura.idFactura != null}">
+                                            <div class="container border border-light rounded shadow">
+                                                <h2 class="fw-bold mt-3" th:text="${'ORDER - ' + factura.fecha}"></h2>
+                                                <hr/>
+                                                <table class="table table-striped table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Producto</th>
+                                                            <th>Size</th>
+                                                            <th>Precio</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody th:each="detalle : ${detalles}">
+                                                        <tr th:if="${detalle.factura.idFactura == factura.idFactura}">
+                                                            <td th:text="${detalle.producto.nombre}"></td>
+                                                            <td th:text="${detalle.size.numero}"></td>
+                                                            <td th:text="${'$' + detalle.precio + ' USD'}"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table class="table table-striped table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Metodo de Pago</th>
+                                                            <th>Sub-Total</th>
+                                                            <th>Impuestos</th>
+                                                            <th>Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td th:text="${factura.metodo}"></td>
+                                                            <td th:text="${'$' + factura.costo + ' USD'}"></td>
+                                                            <td th:text="${'$' + factura.itbis + ' USD'}"></td>
+                                                            <td th:text="${'$' + (factura.costo + factura.itbis) + ' USD'}"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light pb-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scripts -->
+        <script th:replace="scripts :: scripts"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    </body>
+</html>

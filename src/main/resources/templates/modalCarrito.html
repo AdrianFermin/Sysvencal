@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <section th:fragment="modalCarrito">
+            <style>
+                ::-webkit-scrollbar {
+                    width: 7px;
+                }
+
+                ::-webkit-scrollbar-thumb {
+                    background: #6c757d;
+                    border-radius: 10px;
+                }
+            </style>
+
+            <div class="modal fade" id="carritoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header text-white bg-secondary bg-gradient">
+                            <h5 class="modal-title" id="tituloModal">Carrito</h5>
+                            <button onclick="regresarCarrito()" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <section>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <div class="">
+                                            <div>
+                                                <div class="bg-light ms-5 border-secondary border rounded-top mt-1">
+                                                    <div class="d-flex flex-row">
+                                                        <strong><p class="ms-4 mt-2">Producto</p></strong>
+                                                        <div class="d-flex mt-1" style="height: 40px; margin-left: 22px">
+                                                            <div class="vr border rounded"></div>
+                                                        </div>
+                                                        <strong><p class="ms-4 mt-2">Nombre</p></strong>
+                                                        <div class="d-flex mt-1" style="height: 40px; margin-left: 207px">
+                                                            <div class="vr border rounded"></div>
+                                                        </div>
+                                                        <strong><p class="ms-3 mt-2">Cantidad</p></strong>
+                                                        <div class="d-flex mt-1" style="height: 40px; margin-left: 95px">
+                                                            <div class="vr border rounded"></div>
+                                                        </div>
+                                                        <strong><p class="ms-4 mt-2">Costo</p></strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="overflow-auto border border-top-0 border-secondary rounded-bottom ms-5" style="height: 400px">
+                                                <div th:if="${carrito != null}">
+                                                    <div class="ms-3 mt-3 me-3" th:each="detalle : ${carrito}">
+                                                        <div class="d-flex flex-row">
+                                                            <div th:each="portada : ${portadas}">
+                                                                <div th:if="${portada.producto.idProducto == detalle.producto.idProducto}" class="">
+                                                                    <img th:src="${portada.imagen}" class="bg-light mt-2" style="width: 75px;height: 75px;object-fit: contain;">
+                                                                </div>
+                                                            </div>
+                                                            <div class="d-flex ms-4" style="height: 100px;">
+                                                                <div class="vr border rounded"></div>
+                                                            </div>
+                                                            <div class="container">
+                                                                <div class="d-flex flex-row">
+                                                                    <div class="col-md-5">
+                                                                        <p class="fs-4 ms-4 mt-4" th:text="${detalle.producto.nombre}"></p>
+                                                                    </div>
+                                                                    <div class="d-flex ms-4" style="height: 100px;">
+                                                                        <div class="vr border rounded" style=""></div>
+                                                                    </div>
+                                                                    <div class="divStock">
+                                                                        <input hidden th:value="${detalle.producto.stock}">
+                                                                    </div>
+                                                                    <div class="col-md-3 me-2">
+                                                                        <form method="post" th:action="@{/eliminarCarrito/} + ${detalle.producto.idProducto}">
+                                                                            <div class="divInput input-group mt-3 ms-3 me-3">
+                                                                                <button th:id="${'carritomenos' + detalle.producto.idProducto}" type="button" th:onclick="|restarCantidad('carrito','#cantidadCarrito' ,'${detalle.producto.idProducto}')|" class="btn btn-outline-secondary"><i class="fa-solid fa-minus"></i></button>
+                                                                                <input name="cantidad" th:id="${'cantidadCarrito' + detalle.producto.idProducto}" class="form-control text-center" min="0" th:value="${detalle.cantidad}" readonly/>
+                                                                                <button th:id="${'carritomas' + detalle.producto.idProducto}" type="button" th:onclick="|sumarCantidad('carrito','#cantidadCarrito' ,'${detalle.producto.idProducto}', '${detalle.producto.stock}')|" class="btn btn-outline-secondary"><i class="fa-solid fa-plus"></i></button>
+                                                                            </div>
+                                                                            <div class="d-flex flex-row justify-content-center">
+                                                                                <button class="btn btn-danger ms-4 mb-2 mt-3" type="submit" style="margin-left: 35px;"><i class="fa-solid fa-trash"></i></button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <div class="d-flex ms-4" style="height: 100px;">
+                                                                        <div class="vr border rounded" style=""></div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <p class="fs-5 ms-4 mt-4" th:text="${'$' + detalle.producto.precio * detalle.cantidad + ' USD'}"></p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr class="border border-secondary rounded"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mt-1">
+                                        <div class="container">
+                                            <div class="bg-light border border-secondary rounded-top">
+                                                <strong><p class="text-center mt-1">Resumen</p></strong>
+                                            </div>
+                                            <div class="border border-top-0 border-bottom-0 border-secondary">
+                                                <div class="d-flex flex-row">
+                                                    <strong><p class="ms-2 mt-2">Sub-Total:</p></strong>
+                                                    <p class="mt-2" th:text="${'$' + total + ' USD'}" style="margin-left: 30px;"></p>
+                                                </div>
+                                                <div class="d-flex flex-row">
+                                                    <strong><p class="ms-2">ITBIS 18%:</p></strong>
+                                                    <p th:text="${'$' + itbis + ' USD'}" style="margin-left: 27px;"></p>
+                                                </div>
+                                            </div>
+                                            <div class="border border-secondary rounded-bottom">
+                                                <div class="d-flex flex-row">
+                                                    <strong><p class="ms-2 mt-2">Total:</p></strong>
+                                                    <p class="mt-2" th:text="${'$' + itbisTotal + ' USD'}" style="margin-left: 57px;"></p>
+                                                </div>
+                                            </div>
+                                            <div class="d-grid gap-2 mt-3">
+                                                <a class="btn btn-dark" th:href="@{/payment/stage1}" ><i class="fa-solid fa-bag-shopping"></i> Comprar</a>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <div class="container">
+                                            <div class="d-flex flex-row">
+                                                <form class="ms-4" th:action="@{/limpiar}" method="post">
+                                                    <input class="btn btn-danger" type="submit" value="Limpiar"/>
+                                                </form>
+                                                <form id="actuForm" class="ms-2" th:action="@{/actualizarCarrito}" method="post">
+                                                    <div class="actuDiv" th:each="detalle : ${carrito}">
+                                                        <input th:id="${'detail' + detalle.producto.idProducto}" th:value="${detalle.cantidad}" type="hidden"/>
+                                                        <input th:id="${'detailID' + detalle.producto.idProducto}" th:value="${detalle.producto.idProducto}" type="hidden"/>
+                                                    </div>
+                                                </form>
+                                                <form id="trueForm" th:action="@{/actualizarCarrito}" method="post">
+                                                    <input id="trueInput" name="trueInput" type="hidden" value=""/>
+                                                </form>
+                                                <button class="btn btn-warning" onclick="actualizarCarrito()">Actualizar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="modal-footer bg-light pb-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>
